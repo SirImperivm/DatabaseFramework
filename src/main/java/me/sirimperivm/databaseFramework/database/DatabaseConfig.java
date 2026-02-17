@@ -10,6 +10,7 @@ import lombok.Setter;
 public class DatabaseConfig {
 
     private final DatabaseType type;
+    private final String poolName;
 
     // MySQL
     private String host;
