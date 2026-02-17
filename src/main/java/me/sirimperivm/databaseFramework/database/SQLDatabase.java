@@ -3,6 +3,7 @@ package me.sirimperivm.databaseFramework.database;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import me.sirimperivm.databaseFramework.DatabaseQueryException;
+import me.sirimperivm.databaseFramework.schema.TableNameResolver;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,15 +11,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class SQLDatabase implements Database {
 
     protected HikariDataSource dataSource;
 
     private final ExecutorService executor;
+    private final DatabaseConfig config;
+    private final TableNameResolver resolver;
 
-    public SQLDatabase(ExecutorService executor) {
+    private static final Pattern TABLE_PATTERN = Pattern.compile("\\{(.+?)}");
+
+    public SQLDatabase(ExecutorService executor, DatabaseConfig config, TableNameResolver resolver) {
         this.executor = executor;
+        this.config = config;
+        this.resolver = resolver;
     }
 
     protected abstract HikariConfig createConfig();
@@ -50,8 +59,10 @@ public abstract class SQLDatabase implements Database {
     @Override
     public CompletableFuture<Void> executeUpdate(String query, Object... params) {
         return CompletableFuture.runAsync(() -> {
+            String resolvedQuery = resolveTables(query);
+
             try (Connection con = getConnection();
-                 PreparedStatement stmt = prepare(con, query, params)) {
+                 PreparedStatement stmt = prepare(con, resolvedQuery, params)) {
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 throw new DatabaseQueryException(e.getMessage(), query, e);
@@ -62,8 +73,10 @@ public abstract class SQLDatabase implements Database {
     @Override
     public <T> CompletableFuture<T> executeQuery(QueryMapper<T> mapper, String query, Object... params) {
         return CompletableFuture.supplyAsync(() -> {
+            String resolvedQuery = resolveTables(query);
+
             try (Connection con = getConnection();
-                 PreparedStatement stmt = prepare(con, query, params);
+                 PreparedStatement stmt = prepare(con, resolvedQuery, params);
                  ResultSet rs = stmt.executeQuery()) {
                 return mapper.map(rs);
             } catch (SQLException e) {
@@ -78,5 +91,28 @@ public abstract class SQLDatabase implements Database {
             stmt.setObject(i + 1, params[i]);
         }
         return stmt;
+    }
+
+    private String resolveTables(String query) {
+        if (config.getType() == DatabaseType.SQLITE) {
+            return query.replaceAll("\\{(.+?)}", "$1");
+        }
+
+        if (config.getType() == DatabaseType.MYSQL) {
+
+            Matcher matcher = TABLE_PATTERN.matcher(query);
+            StringBuffer sb = new StringBuffer();
+
+            while (matcher.find()) {
+                String tableName = matcher.group(1);
+                String resolved = resolver.resolve(tableName);
+                matcher.appendReplacement(sb, resolved);
+            }
+
+            matcher.appendTail(sb);
+            return sb.toString();
+        }
+
+        return query;
     }
 }
