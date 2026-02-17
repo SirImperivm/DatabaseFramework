@@ -13,5 +13,5 @@ public interface Database {
 
     CompletableFuture<Void> executeUpdate(String query, Object... params);
 
-    <T> CompletableFuture<T> executeQuery(QueryMapper<T> mappe, String query, Object... params);
+    <T> CompletableFuture<T> executeQuery(QueryMapper<T> mapper, String query, Object... params);
 }

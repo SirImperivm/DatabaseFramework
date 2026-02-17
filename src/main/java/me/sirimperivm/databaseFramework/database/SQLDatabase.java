@@ -2,6 +2,7 @@ package me.sirimperivm.databaseFramework.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import me.sirimperivm.databaseFramework.DatabaseQueryException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -53,7 +54,7 @@ public abstract class SQLDatabase implements Database {
                  PreparedStatement stmt = prepare(con, query, params)) {
                 stmt.executeUpdate();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new DatabaseQueryException(e.getMessage(), query, e);
             }
         }, executor);
     }
@@ -66,7 +67,7 @@ public abstract class SQLDatabase implements Database {
                  ResultSet rs = stmt.executeQuery()) {
                 return mapper.map(rs);
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new DatabaseQueryException(e.getMessage(), query, e);
             }
         }, executor);
     }
