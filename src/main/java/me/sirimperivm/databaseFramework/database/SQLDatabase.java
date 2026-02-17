@@ -22,7 +22,7 @@ public abstract class SQLDatabase implements Database {
     protected final DatabaseConfig config;
     private final TableNameResolver resolver;
 
-    private static final Pattern TABLE_PATTERN = Pattern.compile("\\{(.+?)}");
+    private static final Pattern TABLE_PATTERN = Pattern.compile("\\{(.+?)\\}");
 
     public SQLDatabase(ExecutorService executor, DatabaseConfig config) {
         this.executor = executor;
@@ -65,7 +65,7 @@ public abstract class SQLDatabase implements Database {
                  PreparedStatement stmt = prepare(con, resolvedQuery, params)) {
                 stmt.executeUpdate();
             } catch (SQLException e) {
-                throw new DatabaseQueryException(e.getMessage(), query, e);
+                throw new DatabaseQueryException(e.getMessage(), query + "\n" + resolvedQuery, e);
             }
         }, executor);
     }
@@ -80,7 +80,7 @@ public abstract class SQLDatabase implements Database {
                  ResultSet rs = stmt.executeQuery()) {
                 return mapper.map(rs);
             } catch (SQLException e) {
-                throw new DatabaseQueryException(e.getMessage(), query, e);
+                throw new DatabaseQueryException(e.getMessage(), query + "\n" + resolvedQuery, e);
             }
         }, executor);
     }
