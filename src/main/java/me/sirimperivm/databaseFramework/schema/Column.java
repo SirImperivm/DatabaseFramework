@@ -1,26 +1,28 @@
-package me.sirimperivm.databaseFramework.core.schema;
+package me.sirimperivm.databaseFramework.schema;
 
-import me.sirimperivm.databaseFramework.core.DatabaseType;
+import me.sirimperivm.databaseFramework.database.DatabaseType;
 
 public class Column {
 
     private final String name;
-    private final SQLType type;
+    private final DataType type;
 
-    private int length = 255;
+    private String[] params;
+
     private boolean primaryKey;
     private boolean notNull;
     private boolean unique;
     private String defaultValue;
     private boolean autoIncrement;
 
-    public Column(String name, SQLType type) {
+    public Column(String name, DataType type) {
         this.name = name;
         this.type = type;
+        params = new String[0];
     }
 
-    public Column length(int length) {
-        this.length = length;
+    public Column params(String... params) {
+        this.params = params;
         return this;
     }
 
@@ -55,14 +57,14 @@ public class Column {
 
         sb.append(name)
                 .append(" ")
-                .append(type.resolve(databaseType, length));
+                .append(type.resolve(databaseType, params));
 
         if (primaryKey) sb.append(" PRIMARY KEY");
 
         if (autoIncrement) {
             if (databaseType == DatabaseType.MYSQL) sb.append(" AUTO_INCREMENT");
             else {
-                if (type == SQLType.INTEGER && primaryKey) sb.append(" AUTOINCREMENT");
+                if (type == DataType.INTEGER && primaryKey) sb.append(" AUTOINCREMENT");
             }
         }
 
