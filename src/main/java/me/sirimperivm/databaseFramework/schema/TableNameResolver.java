@@ -13,9 +13,9 @@ public class TableNameResolver {
 
     public String resolve(String tableName) {
         if (config.getType() == DatabaseType.MYSQL) {
-            return tableName.replaceAll("\\{(.+?)}", config.getTablePrefix() + "$1");
+            return tableName.replaceAll("\\{(.+?)\\}", config.getTablePrefix() + "$1");
         } else {
-            return tableName.replaceAll("\\{(.+?)}", "$1");
+            return tableName.replaceAll("\\{(.+?)\\}", "$1");
         }
     }
 }
