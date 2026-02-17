@@ -18,7 +18,9 @@ public class SQLite extends SQLDatabase {
         HikariConfig hikari = new HikariConfig();
 
         hikari.setJdbcUrl("jdbc:sqlite:" + config.getFilePath());
+
         hikari.setMaximumPoolSize(1);
+        hikari.setPoolName(config.getPoolName());
 
         return hikari;
     }

@@ -28,6 +28,8 @@ public class MySQL extends SQLDatabase {
         hikari.setPassword(config.getPassword());
 
         hikari.setMaximumPoolSize(config.getPoolSize());
+        hikari.setPoolName(config.getPoolName());
+
         hikari.setMinimumIdle(2);
         hikari.setConnectionTimeout(10000);
         hikari.setLeakDetectionThreshold(60000);
