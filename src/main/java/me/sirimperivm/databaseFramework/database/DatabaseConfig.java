@@ -17,12 +17,12 @@ public class DatabaseConfig {
     private String database;
     private String username;
     private String password;
+    private String tablePrefix = "";
     private String tableName;
     private String options = "";
 
     // SQLite
     private String filePath;
 
-    private String tablePrefix = "";
     private int poolSize = 10;
 }

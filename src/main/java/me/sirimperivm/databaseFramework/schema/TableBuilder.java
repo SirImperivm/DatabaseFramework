@@ -1,6 +1,5 @@
 package me.sirimperivm.databaseFramework.schema;
 
-import me.sirimperivm.databaseFramework.database.DatabaseConfig;
 import me.sirimperivm.databaseFramework.database.DatabaseType;
 
 import java.util.ArrayList;
@@ -10,13 +9,12 @@ import java.util.stream.Collectors;
 public class TableBuilder {
 
     private final String name;
-    private final DatabaseConfig config;
-
     private final List<Column> columns = new ArrayList<>();
+    private final List<Index> indexes = new ArrayList<>();
+    private final List<ForeignKey> foreignKeys = new ArrayList<>();
 
-    public TableBuilder(String name, DatabaseConfig config) {
+    public TableBuilder(String name) {
         this.name = name;
-        this.config = config;
     }
 
     public TableBuilder column(Column column) {
@@ -24,13 +22,51 @@ public class TableBuilder {
         return this;
     }
 
-    public TableDefinition build(DatabaseType type) {
-        String columnSQL = columns.stream()
-                .map(c -> c.build(type))
-                .collect(Collectors.joining(", "));
+    public TableBuilder index(Index index) {
+        indexes.add(index);
+        return this;
+    }
 
-        String sql = "CREATE TABLE IF NOT EXISTS " + config.getTablePrefix() + name + " (" + columnSQL + ");";
+    public TableBuilder foreignKey(ForeignKey fk) {
+        foreignKeys.add(fk);
+        return this;
+    }
 
-        return new TableDefinition(name, sql);
+    public TableDefinition build(DatabaseType type, TableNameResolver resolver) {
+        String tableNameResolved = resolver.resolve("{" + name + "}");
+        StringBuilder create = new StringBuilder();
+        create.append("CREATE TABLE IF NOT EXISTS ")
+                .append(tableNameResolved)
+                .append(" (");
+
+        List<String> definitions = new ArrayList<>();
+
+        for (Column column : columns) {
+            definitions.add(column.build(type));
+        }
+
+        for (ForeignKey fk : foreignKeys) {
+            definitions.add(fk.build());
+        }
+
+        create.append(String.join(", ", definitions));
+        create.append(")");
+
+        if (type == DatabaseType.MYSQL) {
+            create.append(" ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        }
+
+        create.append(";");
+
+        List<String> indexStatements = indexes.stream()
+                .map(i -> i.build(tableNameResolved))
+                .collect(Collectors.toList());
+
+        return new TableDefinition(
+                tableNameResolved,
+                create.toString(),
+                indexStatements,
+                columns
+        );
     }
 }

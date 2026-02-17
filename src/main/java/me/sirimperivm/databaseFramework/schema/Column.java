@@ -1,9 +1,11 @@
 package me.sirimperivm.databaseFramework.schema;
 
+import lombok.Getter;
 import me.sirimperivm.databaseFramework.database.DatabaseType;
 
 public class Column {
 
+    @Getter
     private final String name;
     private final DataType type;
 
