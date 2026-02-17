@@ -19,15 +19,15 @@ public abstract class SQLDatabase implements Database {
     protected HikariDataSource dataSource;
 
     private final ExecutorService executor;
-    private final DatabaseConfig config;
+    protected final DatabaseConfig config;
     private final TableNameResolver resolver;
 
     private static final Pattern TABLE_PATTERN = Pattern.compile("\\{(.+?)}");
 
-    public SQLDatabase(ExecutorService executor, DatabaseConfig config, TableNameResolver resolver) {
+    public SQLDatabase(ExecutorService executor, DatabaseConfig config) {
         this.executor = executor;
         this.config = config;
-        this.resolver = resolver;
+        this.resolver = new TableNameResolver(config);
     }
 
     protected abstract HikariConfig createConfig();

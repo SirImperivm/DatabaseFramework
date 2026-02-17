@@ -8,11 +8,8 @@ import java.util.concurrent.ExecutorService;
 
 public class SQLite extends SQLDatabase {
 
-    private final DatabaseConfig config;
-
     public SQLite(ExecutorService executor, DatabaseConfig config) {
-        super(executor);
-        this.config = config;
+        super(executor, config);
     }
 
     @Override
