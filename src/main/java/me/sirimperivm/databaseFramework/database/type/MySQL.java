@@ -1,16 +1,16 @@
-package me.sirimperivm.databaseFramework.core.database;
+package me.sirimperivm.databaseFramework.database.type;
 
 import com.zaxxer.hikari.HikariConfig;
-import me.sirimperivm.databaseFramework.core.DatabaseConfig;
-import me.sirimperivm.databaseFramework.core.SQLDatabase;
+import me.sirimperivm.databaseFramework.database.DatabaseConfig;
+import me.sirimperivm.databaseFramework.database.SQLDatabase;
 
 import java.util.concurrent.ExecutorService;
 
-public class MySQLDatabase extends SQLDatabase {
+public class MySQL extends SQLDatabase {
 
     private final DatabaseConfig config;
 
-    public MySQLDatabase(ExecutorService executor, DatabaseConfig config) {
+    public MySQL(ExecutorService executor, DatabaseConfig config) {
         super(executor);
         this.config = config;
     }

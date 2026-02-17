@@ -1,6 +1,7 @@
-package me.sirimperivm.databaseFramework.core.schema;
+package me.sirimperivm.databaseFramework.schema;
 
-import me.sirimperivm.databaseFramework.core.DatabaseType;
+import me.sirimperivm.databaseFramework.database.DatabaseConfig;
+import me.sirimperivm.databaseFramework.database.DatabaseType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +10,13 @@ import java.util.stream.Collectors;
 public class TableBuilder {
 
     private final String name;
+    private final DatabaseConfig config;
+
     private final List<Column> columns = new ArrayList<>();
 
-    public TableBuilder(String name) {
+    public TableBuilder(String name, DatabaseConfig config) {
         this.name = name;
+        this.config = config;
     }
 
     public TableBuilder column(Column column) {
@@ -25,7 +29,7 @@ public class TableBuilder {
                 .map(c -> c.build(type))
                 .collect(Collectors.joining(", "));
 
-        String sql = "CREATE TABLE IF NOT EXISTS " + name + " (" + columnSQL + ");";
+        String sql = "CREATE TABLE IF NOT EXISTS " + config.getTablePrefix() + name + " (" + columnSQL + ");";
 
         return new TableDefinition(name, sql);
     }

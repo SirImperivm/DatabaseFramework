@@ -1,4 +1,4 @@
-package me.sirimperivm.databaseFramework.core;
+package me.sirimperivm.databaseFramework.database;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +23,6 @@ public class DatabaseConfig {
     // SQLite
     private String filePath;
 
+    private String tablePrefix = "";
     private int poolSize = 10;
 }

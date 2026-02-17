@@ -1,16 +1,16 @@
-package me.sirimperivm.databaseFramework.core.database;
+package me.sirimperivm.databaseFramework.database.type;
 
 import com.zaxxer.hikari.HikariConfig;
-import me.sirimperivm.databaseFramework.core.DatabaseConfig;
-import me.sirimperivm.databaseFramework.core.SQLDatabase;
+import me.sirimperivm.databaseFramework.database.DatabaseConfig;
+import me.sirimperivm.databaseFramework.database.SQLDatabase;
 
 import java.util.concurrent.ExecutorService;
 
-public class SQLiteDatabase extends SQLDatabase {
+public class SQLite extends SQLDatabase {
 
     private final DatabaseConfig config;
 
-    public SQLiteDatabase(ExecutorService executor, DatabaseConfig config) {
+    public SQLite(ExecutorService executor, DatabaseConfig config) {
         super(executor);
         this.config = config;
     }

@@ -1,7 +1,9 @@
-package me.sirimperivm.databaseFramework.core.schema;
+package me.sirimperivm.databaseFramework;
 
-import me.sirimperivm.databaseFramework.core.Database;
-import me.sirimperivm.databaseFramework.core.DatabaseType;
+import me.sirimperivm.databaseFramework.database.Database;
+import me.sirimperivm.databaseFramework.database.DatabaseType;
+import me.sirimperivm.databaseFramework.schema.TableBuilder;
+import me.sirimperivm.databaseFramework.schema.TableDefinition;
 
 import java.util.ArrayList;
 import java.util.List;

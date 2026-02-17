@@ -1,4 +1,4 @@
-package me.sirimperivm.databaseFramework.core;
+package me.sirimperivm.databaseFramework.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

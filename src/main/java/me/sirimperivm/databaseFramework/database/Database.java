@@ -1,4 +1,4 @@
-package me.sirimperivm.databaseFramework.core;
+package me.sirimperivm.databaseFramework.database;
 
 import java.sql.Connection;
 import java.util.concurrent.CompletableFuture;
