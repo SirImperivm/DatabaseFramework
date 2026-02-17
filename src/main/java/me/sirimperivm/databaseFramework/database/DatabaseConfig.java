@@ -18,7 +18,6 @@ public class DatabaseConfig {
     private String username;
     private String password;
     private String tablePrefix = "";
-    private String tableName;
     private String options = "";
 
     // SQLite

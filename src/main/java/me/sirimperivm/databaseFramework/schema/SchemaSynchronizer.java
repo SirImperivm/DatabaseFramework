@@ -17,7 +17,6 @@ public class SchemaSynchronizer {
     }
 
     public void synchronize(TableDefinition table) {
-
         database.executeQuery(rs -> {
 
                     Set<String> existingColumns = new HashSet<>();

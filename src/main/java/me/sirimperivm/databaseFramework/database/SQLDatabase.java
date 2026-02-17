@@ -11,8 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class SQLDatabase implements Database {
 
@@ -22,12 +20,10 @@ public abstract class SQLDatabase implements Database {
     protected final DatabaseConfig config;
     private final TableNameResolver resolver;
 
-    private static final Pattern TABLE_PATTERN = Pattern.compile("\\{(.+?)\\}");
-
-    public SQLDatabase(ExecutorService executor, DatabaseConfig config) {
+    public SQLDatabase(ExecutorService executor, DatabaseConfig config, TableNameResolver resolver) {
         this.executor = executor;
         this.config = config;
-        this.resolver = new TableNameResolver(config);
+        this.resolver = resolver;
     }
 
     protected abstract HikariConfig createConfig();
@@ -59,7 +55,7 @@ public abstract class SQLDatabase implements Database {
     @Override
     public CompletableFuture<Void> executeUpdate(String query, Object... params) {
         return CompletableFuture.runAsync(() -> {
-            String resolvedQuery = resolveTables(query);
+            String resolvedQuery = resolveQuery(query);
 
             try (Connection con = getConnection();
                  PreparedStatement stmt = prepare(con, resolvedQuery, params)) {
@@ -73,7 +69,7 @@ public abstract class SQLDatabase implements Database {
     @Override
     public <T> CompletableFuture<T> executeQuery(QueryMapper<T> mapper, String query, Object... params) {
         return CompletableFuture.supplyAsync(() -> {
-            String resolvedQuery = resolveTables(query);
+            String resolvedQuery = resolveQuery(query);
 
             try (Connection con = getConnection();
                  PreparedStatement stmt = prepare(con, resolvedQuery, params);
@@ -93,26 +89,7 @@ public abstract class SQLDatabase implements Database {
         return stmt;
     }
 
-    private String resolveTables(String query) {
-        if (config.getType() == DatabaseType.SQLITE) {
-            return query.replaceAll("\\{(.+?)}", "$1");
-        }
-
-        if (config.getType() == DatabaseType.MYSQL) {
-
-            Matcher matcher = TABLE_PATTERN.matcher(query);
-            StringBuffer sb = new StringBuffer();
-
-            while (matcher.find()) {
-                String tableName = matcher.group(1);
-                String resolved = resolver.resolve(tableName);
-                matcher.appendReplacement(sb, resolved);
-            }
-
-            matcher.appendTail(sb);
-            return sb.toString();
-        }
-
-        return query;
+    private String resolveQuery(String query) {
+        return resolver.resolve(query);
     }
 }
