@@ -11,7 +11,9 @@ public interface Database {
 
     Connection getConnection();
 
-    CompletableFuture<Void> executeUpdate(String query, Object... params);
+    void executeUpdate(String query, Object... params);
+    CompletableFuture<Void> executeUpdateAsync(String query, Object... params);
 
-    <T> CompletableFuture<T> executeQuery(QueryMapper<T> mapper, String query, Object... params);
+    <T> T executeQuery(QueryMapper<T> mapper, String query, Object... params);
+    <T> CompletableFuture<T> executeQueryAsync(QueryMapper<T> mapper, String query, Object... params);
 }
