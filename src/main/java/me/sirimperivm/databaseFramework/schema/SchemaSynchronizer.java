@@ -17,7 +17,7 @@ public class SchemaSynchronizer {
     }
 
     public void synchronize(TableDefinition table) {
-        database.executeQuery(rs -> {
+        database.executeQueryAsync(rs -> {
 
                     Set<String> existingColumns = new HashSet<>();
 
@@ -34,7 +34,7 @@ public class SchemaSynchronizer {
                                     column.build(type) +
                                     ";";
 
-                            database.executeUpdate(alter);
+                            database.executeUpdateAsync(alter);
                         }
                     }
 

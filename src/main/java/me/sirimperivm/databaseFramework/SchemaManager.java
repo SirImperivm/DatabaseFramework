@@ -1,12 +1,10 @@
 package me.sirimperivm.databaseFramework;
 
 import me.sirimperivm.databaseFramework.database.Database;
-import me.sirimperivm.databaseFramework.database.DatabaseType;
-import me.sirimperivm.databaseFramework.schema.Index;
-import me.sirimperivm.databaseFramework.schema.TableBuilder;
 import me.sirimperivm.databaseFramework.schema.TableDefinition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SchemaManager {
@@ -18,16 +16,26 @@ public class SchemaManager {
         this.database = database;
     }
 
-    public SchemaManager register(TableDefinition definition) {
-        tables.add(definition);
+    public SchemaManager register(TableDefinition... definitions) {
+        if (definitions.length == 0) return this;
+
+        tables.addAll(Arrays.asList(definitions));
         return this;
     }
 
     public void createAll() {
         for (TableDefinition table : tables) {
-            database.executeUpdate(table.createTableSQL());
-            for (String indexSQL : table.indexSQL()) {
-                database.executeUpdate(indexSQL);
+            try {
+                database.executeUpdate(table.createTableSQL());
+                for (String indexSQL : table.indexSQL()) {
+                    try {
+                        database.executeUpdate(indexSQL);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

@@ -2,7 +2,6 @@ package me.sirimperivm.databaseFramework.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import me.sirimperivm.databaseFramework.DatabaseQueryException;
 import me.sirimperivm.databaseFramework.schema.TableNameResolver;
 
 import java.sql.Connection;
@@ -53,7 +52,32 @@ public abstract class SQLDatabase implements Database {
     }
 
     @Override
-    public CompletableFuture<Void> executeUpdate(String query, Object... params) {
+    public void executeUpdate(String query, Object... params) {
+        String resolvedQuery = resolveQuery(query);
+
+        try (Connection con = getConnection();
+             PreparedStatement stmt = prepare(con, resolvedQuery, params)) {
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseQueryException(e.getMessage(), query + "\n" + resolvedQuery, e);
+        }
+    }
+
+    @Override
+    public <T> T executeQuery(QueryMapper<T> mapper, String query, Object... params) {
+        String resolvedQuery = resolveQuery(query);
+
+        try (Connection con = getConnection();
+             PreparedStatement stmt = prepare(con, resolvedQuery, params);
+             ResultSet rs = stmt.executeQuery()) {
+            return mapper.map(rs);
+        } catch (SQLException e) {
+            throw new DatabaseQueryException(e.getMessage(), query + "\n" + resolvedQuery, e);
+        }
+    }
+
+    @Override
+    public CompletableFuture<Void> executeUpdateAsync(String query, Object... params) {
         return CompletableFuture.runAsync(() -> {
             String resolvedQuery = resolveQuery(query);
 
@@ -67,7 +91,7 @@ public abstract class SQLDatabase implements Database {
     }
 
     @Override
-    public <T> CompletableFuture<T> executeQuery(QueryMapper<T> mapper, String query, Object... params) {
+    public <T> CompletableFuture<T> executeQueryAsync(QueryMapper<T> mapper, String query, Object... params) {
         return CompletableFuture.supplyAsync(() -> {
             String resolvedQuery = resolveQuery(query);
 
