@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
@@ -52,8 +53,8 @@ public abstract class SQLDatabase implements Database {
     }
 
     @Override
-    public void executeUpdate(String query, Object... params) {
-        String resolvedQuery = resolveQuery(query);
+    public void execute(String query, Object... params) {
+        String resolvedQuery = resolver.resolve(query);
 
         try (Connection con = getConnection();
              PreparedStatement stmt = prepare(con, resolvedQuery, params)) {
@@ -64,8 +65,8 @@ public abstract class SQLDatabase implements Database {
     }
 
     @Override
-    public <T> T executeQuery(QueryMapper<T> mapper, String query, Object... params) {
-        String resolvedQuery = resolveQuery(query);
+    public <T> T query(QueryMapper<T> mapper, String query, Object... params) {
+        String resolvedQuery = resolver.resolve(query);
 
         try (Connection con = getConnection();
              PreparedStatement stmt = prepare(con, resolvedQuery, params);
@@ -77,32 +78,23 @@ public abstract class SQLDatabase implements Database {
     }
 
     @Override
-    public CompletableFuture<Void> executeUpdateAsync(String query, Object... params) {
-        return CompletableFuture.runAsync(() -> {
-            String resolvedQuery = resolveQuery(query);
-
-            try (Connection con = getConnection();
-                 PreparedStatement stmt = prepare(con, resolvedQuery, params)) {
-                stmt.executeUpdate();
-            } catch (SQLException e) {
-                throw new DatabaseQueryException(e.getMessage(), query + "\n" + resolvedQuery, e);
-            }
-        }, executor);
+    public void executeList(List<String> queries, Object... params) {
+        for (String query : queries) execute(query, params);
     }
 
     @Override
-    public <T> CompletableFuture<T> executeQueryAsync(QueryMapper<T> mapper, String query, Object... params) {
-        return CompletableFuture.supplyAsync(() -> {
-            String resolvedQuery = resolveQuery(query);
+    public CompletableFuture<Void> executeAsync(String query, Object... params) {
+        return CompletableFuture.runAsync(() -> execute(query, params), executor);
+    }
 
-            try (Connection con = getConnection();
-                 PreparedStatement stmt = prepare(con, resolvedQuery, params);
-                 ResultSet rs = stmt.executeQuery()) {
-                return mapper.map(rs);
-            } catch (SQLException e) {
-                throw new DatabaseQueryException(e.getMessage(), query + "\n" + resolvedQuery, e);
-            }
-        }, executor);
+    @Override
+    public CompletableFuture<Void> executeListAsync(List<String> queries, Object... params) {
+        return CompletableFuture.runAsync(() -> executeList(queries, params), executor);
+    }
+
+    @Override
+    public <T> CompletableFuture<T> queryAsync(QueryMapper<T> mapper, String query, Object... params) {
+        return CompletableFuture.supplyAsync(() -> query(mapper, query, params), executor);
     }
 
     private PreparedStatement prepare(Connection con, String query, Object... params) throws SQLException {
@@ -111,9 +103,5 @@ public abstract class SQLDatabase implements Database {
             stmt.setObject(i + 1, params[i]);
         }
         return stmt;
-    }
-
-    private String resolveQuery(String query) {
-        return resolver.resolve(query);
     }
 }

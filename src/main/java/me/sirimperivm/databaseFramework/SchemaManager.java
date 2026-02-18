@@ -26,10 +26,10 @@ public class SchemaManager {
     public void createAll() {
         for (TableDefinition table : tables) {
             try {
-                database.executeUpdate(table.createTableSQL());
+                database.execute(table.createTableSQL());
                 for (String indexSQL : table.indexSQL()) {
                     try {
-                        database.executeUpdate(indexSQL);
+                        database.execute(indexSQL);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

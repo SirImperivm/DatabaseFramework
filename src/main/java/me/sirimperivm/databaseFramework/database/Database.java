@@ -1,6 +1,7 @@
 package me.sirimperivm.databaseFramework.database;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface Database {
@@ -11,9 +12,12 @@ public interface Database {
 
     Connection getConnection();
 
-    void executeUpdate(String query, Object... params);
-    CompletableFuture<Void> executeUpdateAsync(String query, Object... params);
+    void execute(String query, Object... params);
+    CompletableFuture<Void> executeAsync(String query, Object... params);
 
-    <T> T executeQuery(QueryMapper<T> mapper, String query, Object... params);
-    <T> CompletableFuture<T> executeQueryAsync(QueryMapper<T> mapper, String query, Object... params);
+    void executeList(List<String> queries, Object... params);
+    CompletableFuture<Void>executeListAsync(List<String> queries, Object... params);
+
+    <T> T query(QueryMapper<T> mapper, String query, Object... params);
+    <T> CompletableFuture<T> queryAsync(QueryMapper<T> mapper, String query, Object... params);
 }

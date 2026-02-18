@@ -27,7 +27,7 @@ public class SQLite extends SQLDatabase {
 
     @Override
     protected void configureDatabase() {
-        executeUpdate("PRAGMA journal_mode=WAL;");
-        executeUpdate("PRAGMA synchronous=NORMAL;");
+        execute("PRAGMA journal_mode=WAL;");
+        execute("PRAGMA synchronous=NORMAL;");
     }
 }
