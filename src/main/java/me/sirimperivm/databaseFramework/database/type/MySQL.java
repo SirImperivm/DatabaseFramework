@@ -17,22 +17,30 @@ public class MySQL extends SQLDatabase {
     protected HikariConfig createConfig() {
         HikariConfig hikari = new HikariConfig();
 
-        hikari.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s%s"
+        hikari.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s"
                 , config.getHost()
                 , config.getPort()
                 , config.getDatabase()
-                , config.getOptions()
         ));
 
         hikari.setUsername(config.getUsername());
         hikari.setPassword(config.getPassword());
 
-        hikari.setMaximumPoolSize(config.getPoolSize());
         hikari.setPoolName(config.getPoolName());
+        hikari.setMaximumPoolSize(config.getMaxPoolSize());
+        hikari.setMinimumIdle(config.getMinimumIdle());
+        hikari.setConnectionTimeout(config.getConnectionTimeout());
+        hikari.setIdleTimeout(config.getIdleTimeout());
+        hikari.setMaxLifetime(config.getMaxLifeTime());
+        hikari.setKeepaliveTime(config.getKeepAliveTime());
 
-        hikari.setMinimumIdle(2);
-        hikari.setConnectionTimeout(10000);
-        hikari.setLeakDetectionThreshold(60000);
+        hikari.addDataSourceProperty("cachePrepStmts", config.getCachePrepStmts());
+        hikari.addDataSourceProperty("prepStmtCacheSize", config.getPrepStmtCacheSize());
+        hikari.addDataSourceProperty("prepStmtCacheSqlLimit", config.getPrepStmtCacheSqlLimit());
+        hikari.addDataSourceProperty("useServerPrepStmts", config.getUseServerPrepStmts());
+        hikari.addDataSourceProperty("useUnicode", config.getUseUnicode());
+        hikari.addDataSourceProperty("characterEncoding", config.getCharacterEncoding());
+        hikari.addDataSourceProperty("useSSL", config.getUseSSL());
 
         return hikari;
     }
