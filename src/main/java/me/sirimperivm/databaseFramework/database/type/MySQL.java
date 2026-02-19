@@ -3,14 +3,13 @@ package me.sirimperivm.databaseFramework.database.type;
 import com.zaxxer.hikari.HikariConfig;
 import me.sirimperivm.databaseFramework.database.DatabaseConfig;
 import me.sirimperivm.databaseFramework.database.SQLDatabase;
-import me.sirimperivm.databaseFramework.schema.TableNameResolver;
 
 import java.util.concurrent.ExecutorService;
 
 public class MySQL extends SQLDatabase {
 
-    public MySQL(ExecutorService executor, DatabaseConfig config, TableNameResolver resolver) {
-        super(executor, config, resolver);
+    public MySQL(ExecutorService executor, DatabaseConfig config) {
+        super(executor, config);
     }
 
     @Override
