@@ -2,13 +2,11 @@ package me.sirimperivm.databaseFramework.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import me.sirimperivm.databaseFramework.schema.TableNameResolver;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
@@ -18,12 +16,12 @@ public abstract class SQLDatabase implements Database {
 
     private final ExecutorService executor;
     protected final DatabaseConfig config;
-    private final TableNameResolver resolver;
+    protected final TableNameResolver resolver;
 
-    public SQLDatabase(ExecutorService executor, DatabaseConfig config, TableNameResolver resolver) {
+    public SQLDatabase(ExecutorService executor, DatabaseConfig config) {
         this.executor = executor;
         this.config = config;
-        this.resolver = resolver;
+        this.resolver = new TableNameResolver(config);
     }
 
     protected abstract HikariConfig createConfig();
@@ -78,8 +76,8 @@ public abstract class SQLDatabase implements Database {
     }
 
     @Override
-    public void executeList(List<String> queries, Object... params) {
-        for (String query : queries) execute(query, params);
+    public void executeList(String... queries) {
+        for (String query : queries) execute(query);
     }
 
     @Override
@@ -88,8 +86,8 @@ public abstract class SQLDatabase implements Database {
     }
 
     @Override
-    public CompletableFuture<Void> executeListAsync(List<String> queries, Object... params) {
-        return CompletableFuture.runAsync(() -> executeList(queries, params), executor);
+    public CompletableFuture<Void> executeListAsync(String... queries) {
+        return CompletableFuture.runAsync(() -> executeList(queries), executor);
     }
 
     @Override
