@@ -15,8 +15,8 @@ public interface Database {
     void execute(String query, Object... params);
     CompletableFuture<Void> executeAsync(String query, Object... params);
 
-    void executeList(List<String> queries, Object... params);
-    CompletableFuture<Void>executeListAsync(List<String> queries, Object... params);
+    void executeList(String... queries);
+    CompletableFuture<Void>executeListAsync(String... queries);
 
     <T> T query(QueryMapper<T> mapper, String query, Object... params);
     <T> CompletableFuture<T> queryAsync(QueryMapper<T> mapper, String query, Object... params);
