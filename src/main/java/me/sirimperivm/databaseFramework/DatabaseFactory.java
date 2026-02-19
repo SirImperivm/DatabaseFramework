@@ -10,8 +10,9 @@ import java.util.concurrent.Executors;
 
 public class DatabaseFactory{
 
-    public static Database create(DatabaseConfig config) {
-        ExecutorService executor = Executors.newFixedThreadPool(3);
+    public static Database create(DatabaseConfig config, int threadPoolSize) {
+        int nThreads = Math.max(1, threadPoolSize);
+        ExecutorService executor = Executors.newFixedThreadPool(nThreads);
         return create(executor, config);
     }
 
