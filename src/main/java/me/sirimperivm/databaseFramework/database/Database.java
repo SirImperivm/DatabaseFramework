@@ -1,9 +1,9 @@
 package me.sirimperivm.databaseFramework.database;
 
 import java.sql.Connection;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+@SuppressWarnings("unused")
 public interface Database {
 
     void connect();
@@ -20,4 +20,6 @@ public interface Database {
 
     <T> T query(QueryMapper<T> mapper, String query, Object... params);
     <T> CompletableFuture<T> queryAsync(QueryMapper<T> mapper, String query, Object... params);
+
+    TableNameResolver getResolver();
 }

@@ -95,6 +95,11 @@ public abstract class SQLDatabase implements Database {
         return CompletableFuture.supplyAsync(() -> query(mapper, query, params), executor);
     }
 
+    @Override
+    public TableNameResolver getResolver() {
+        return resolver;
+    }
+
     private PreparedStatement prepare(Connection con, String query, Object... params) throws SQLException {
         PreparedStatement stmt = con.prepareStatement(query);
         for (int i = 0; i < params.length; i++) {
