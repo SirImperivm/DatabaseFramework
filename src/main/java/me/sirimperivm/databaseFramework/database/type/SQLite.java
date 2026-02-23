@@ -23,10 +23,4 @@ public class SQLite extends SQLDatabase {
 
         return hikari;
     }
-
-    @Override
-    protected void configureDatabase() {
-        execute("PRAGMA journal_mode=WAL;");
-        execute("PRAGMA synchronous=NORMAL;");
-    }
 }
