@@ -39,7 +39,7 @@ public class TableBuilder {
 
     public TableDefinition build(DatabaseType type) {
         TableNameResolver resolver = database.getResolver();
-        String tableNameResolved = resolver.resolve("{" + name + "}");
+        String tableNameResolved = resolver.resolve("[" + name + "]");
         StringBuilder create = new StringBuilder();
         create.append("CREATE TABLE IF NOT EXISTS ")
                 .append(tableNameResolved)
