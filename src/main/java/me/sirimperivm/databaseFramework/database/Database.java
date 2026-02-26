@@ -18,8 +18,8 @@ public interface Database {
     void executeList(String... queries);
     CompletableFuture<Void>executeListAsync(String... queries);
 
-    <T> T query(QueryMapper<T> mapper, String query, Object... params);
-    <T> CompletableFuture<T> queryAsync(QueryMapper<T> mapper, String query, Object... params);
+    <T> T query(String query, QueryMapper<T> mapper, Object... params);
+    <T> CompletableFuture<T> queryAsync(String query, QueryMapper<T> mapper, Object... params);
 
     TableNameResolver getResolver();
 

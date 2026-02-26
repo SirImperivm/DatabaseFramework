@@ -18,31 +18,31 @@ public class SchemaSynchronizer {
     }
 
     public void synchronize(TableDefinition table) {
-        database.queryAsync(rs -> {
-            Set<String> existingColumns = new HashSet<>();
+        database.queryAsync(type == DatabaseType.MYSQL ? table.name() : null, rs -> {
+        Set<String> existingColumns = new HashSet<>();
 
-            while (rs.next()) {
-                existingColumns.add(rs.getString(1));
+        while (rs.next()) {
+            existingColumns.add(rs.getString(1));
+        }
+
+        for (Column column : table.columns()) {
+            if (!existingColumns.contains(column.getName())) {
+
+                String alter = "ALTER TABLE " +
+                        table.name() +
+                        " ADD COLUMN " +
+                        column.build(type) +
+                        ";";
+
+                database.executeAsync(alter);
             }
+        }
 
-            for (Column column : table.columns()) {
-                if (!existingColumns.contains(column.getName())) {
-
-                    String alter = "ALTER TABLE " +
-                            table.name() +
-                            " ADD COLUMN " +
-                            column.build(type) +
-                            ";";
-
-                    database.executeAsync(alter);
-                }
-            }
-
-            return null;
-            }, type == DatabaseType.MYSQL
+        return null;
+        },
+        type == DatabaseType.MYSQL
                     ? "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?"
-                    : "PRAGMA table_info(" + table.name() + ");",
-            type == DatabaseType.MYSQL ? table.name() : null
+                    : "PRAGMA table_info(" + table.name() + ");"
         );
     }
 }

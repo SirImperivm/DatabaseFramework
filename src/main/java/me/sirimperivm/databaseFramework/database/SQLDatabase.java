@@ -70,7 +70,7 @@ public abstract class SQLDatabase implements Database {
     }
 
     @Override
-    public <T> T query(QueryMapper<T> mapper, String query, Object... params) {
+    public <T> T query(String query, QueryMapper<T> mapper, Object... params) {
         runBefore();
 
         String resolvedQuery = resolver.resolve(query);
@@ -102,8 +102,8 @@ public abstract class SQLDatabase implements Database {
     }
 
     @Override
-    public <T> CompletableFuture<T> queryAsync(QueryMapper<T> mapper, String query, Object... params) {
-        return CompletableFuture.supplyAsync(() -> query(mapper, query, params), executor);
+    public <T> CompletableFuture<T> queryAsync(String query, QueryMapper<T> mapper, Object... params) {
+        return CompletableFuture.supplyAsync(() -> query(query, mapper, params), executor);
     }
 
     @Override
