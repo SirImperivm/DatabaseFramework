@@ -22,7 +22,4 @@ public interface Database {
     <T> CompletableFuture<T> queryAsync(String query, QueryMapper<T> mapper, Object... params);
 
     TableNameResolver getResolver();
-
-    Database before(Runnable action);
-    Database after(Runnable action);
 }

@@ -55,8 +55,6 @@ public abstract class SQLDatabase implements Database {
 
     @Override
     public void execute(String query, Object... params) {
-        runBefore();
-
         String resolvedQuery = resolver.resolve(query);
 
         try (Connection con = getConnection();
@@ -64,15 +62,11 @@ public abstract class SQLDatabase implements Database {
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new DatabaseQueryException(e.getMessage(), query + "\n" + resolvedQuery, e);
-        } finally {
-            runAfter();
         }
     }
 
     @Override
     public <T> T query(String query, QueryMapper<T> mapper, Object... params) {
-        runBefore();
-
         String resolvedQuery = resolver.resolve(query);
 
         try (Connection con = getConnection();
@@ -81,8 +75,6 @@ public abstract class SQLDatabase implements Database {
             return mapper.map(rs);
         } catch (SQLException e) {
             throw new DatabaseQueryException(e.getMessage(), query + "\n" + resolvedQuery, e);
-        } finally {
-            runAfter();
         }
     }
 
@@ -109,26 +101,6 @@ public abstract class SQLDatabase implements Database {
     @Override
     public TableNameResolver getResolver() {
         return resolver;
-    }
-
-    @Override
-    public Database before(Runnable action) {
-        this.before = action;
-        return this;
-    }
-
-    @Override
-    public Database after(Runnable action) {
-        this.after = action;
-        return this;
-    }
-
-    private void runBefore() {
-        if (before != null) before.run();
-    }
-
-    private void runAfter() {
-        if (after != null) after.run();
     }
 
     private PreparedStatement prepare(Connection con, String query, Object... params) throws SQLException {
