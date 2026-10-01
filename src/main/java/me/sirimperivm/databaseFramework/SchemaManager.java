@@ -3,15 +3,13 @@ package me.sirimperivm.databaseFramework;
 import me.sirimperivm.databaseFramework.database.Database;
 import me.sirimperivm.databaseFramework.schema.TableDefinition;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class SchemaManager {
 
     private final Database database;
-    private final List<TableDefinition> tables = new ArrayList<>();
+    private final List<TableDefinition> tables = new LinkedList<>();
 
     public SchemaManager(Database database) {
         this.database = database;
@@ -39,5 +37,9 @@ public class SchemaManager {
                 e.printStackTrace();
             }
         }
+    }
+
+    public List<TableDefinition> getTables() {
+        return Collections.unmodifiableList(tables);
     }
 }
